@@ -70,30 +70,35 @@ transValid = InputValid()
 words = ChoiceWords(dictOut.selectDict)
 wordsValid = InputValid()
 
-for key in dictOut.selectDict:
-	
-	trans.num_options(dictVal.choice) 
-	trans.out_word(key)
-	trans.right_option(trans.dictionary[key])
-	trans.del_right_option(key, trans.dictionary)
-	trans.add_wrong_translations(trans.wrongDict)
-	trans.output_translations(trans.translate_out)
-	transValid.prompt()
-	transValid.type_check(transValid.prompt)
-	transValid.check_entry(1, trans.options, transValid.prompt, transValid.type_check)
-	trans.compare_option(transValid.choice, trans.dictionary[key])
-		
-	words.numOptions = trans.numOptions
-	supStr = words.translate_out(words.dictionary[key][0:-2])
-	print(supStr)
-	words.out_word(supStr)
-	words.right_option(key)
-	words.del_right_option(key, words.dictionary)
-	words.add_wrong_words(words.wrongDict)
-	words.output_words()
-	wordsValid.prompt()
-	wordsValid.type_check(wordsValid.prompt)
-	wordsValid.check_entry(1, words.options, wordsValid.prompt, wordsValid.type_check)
-	words.compare_option(wordsValid.choice, key)
-	
+'''
+while trans.dictionary:
+	for key in trans.dictionary:
+		trans.num_options(dictVal.choice)
+		trans.out_word(key)
+		trans.right_option(dictOut.selectDict[key])
+		trans.del_right_option(key, dictOut.selectDict)
+		trans.add_wrong_translations(trans.wrongDict)
+		trans.output_translations(trans.translate_out)
+		transValid.prompt()
+		transValid.type_check(transValid.prompt)
+		transValid.check_entry(1, trans.options, transValid.prompt, transValid.type_check)
+		trans.compare_option(transValid.choice, trans.dictionary[key], key)
+		print(trans.listForDel)
+	trans.del_right_answers()
+	'''
+while words.dictionary:
+	for key in words.dictionary:
+		words.numOptions = trans.numOptions
+		supStr = words.translate_out(words.dictionary[key][0:-2])
+		print(supStr)
+		words.out_word(supStr)
+		words.right_option(key)
+		words.del_right_option(key, dictOut.selectDict)
+		words.add_wrong_words(dictOut.selectDict)
+		words.output_words()
+		wordsValid.prompt()
+		wordsValid.type_check(wordsValid.prompt)
+		wordsValid.check_entry(1, words.options, wordsValid.prompt, wordsValid.type_check)
+		words.compare_option(wordsValid.choice, key)
+
 db.close()
