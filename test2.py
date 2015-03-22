@@ -42,7 +42,7 @@ class ChoiceTranslations:
 			i += 1 
 	def correct_answer(self, dict):
 		del self.dict[key]
-	def compare_option(self, choice, value, key):
+	def compare_option(self, choice, value, key, func):
 		choice = [self.options[int(choice) - 1]]
 		if ', ' in choice[0]:
 			num = choice[0].find(', ')
@@ -52,7 +52,9 @@ class ChoiceTranslations:
 		if choice in value:
 			self.listForDel += [key]
 		else:
-			print('Wrong ', choice)
+			supStr = func(value[0:-2])
+			print("\tIt's wrong!\n", key, ' - ', supStr)
+			input()
 	def del_right_answers(self):
 		for key in self.listForDel:
 			del self.dictionary[key]
@@ -62,6 +64,7 @@ class ChoiceWords(ChoiceTranslations):
 	"""docstring for ChoiceWords"""
 	def __init__(self, dict):
 		self.dictionary = dict.copy()
+		self.listForDel = []
 	def output_words(self):
 		self.options = self.options[0:self.numOptions]
 		random.shuffle(self.options)
@@ -72,3 +75,10 @@ class ChoiceWords(ChoiceTranslations):
 	def add_wrong_words(self, wrongDict):
 		for word in wrongDict:
 			self.options += [word]
+	def compare_option(self, choice, key, supStr):
+		choice = [self.options[int(choice) - 1]]
+		if choice[0] == key:
+			self.listForDel += [key]
+		else:
+			print("\tIt's wrong!\n", key, ' - ', supStr)
+			input()

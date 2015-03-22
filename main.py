@@ -70,10 +70,10 @@ transValid = InputValid()
 words = ChoiceWords(dictOut.selectDict)
 wordsValid = InputValid()
 
-'''
+trans.num_options(dictVal.choice)
+
 while trans.dictionary:
 	for key in trans.dictionary:
-		trans.num_options(dictVal.choice)
 		trans.out_word(key)
 		trans.right_option(dictOut.selectDict[key])
 		trans.del_right_option(key, dictOut.selectDict)
@@ -82,23 +82,22 @@ while trans.dictionary:
 		transValid.prompt()
 		transValid.type_check(transValid.prompt)
 		transValid.check_entry(1, trans.options, transValid.prompt, transValid.type_check)
-		trans.compare_option(transValid.choice, trans.dictionary[key], key)
-		print(trans.listForDel)
+		trans.compare_option(transValid.choice, trans.dictionary[key], key, trans.translate_out)
 	trans.del_right_answers()
-	'''
+
 while words.dictionary:
 	for key in words.dictionary:
 		words.numOptions = trans.numOptions
 		supStr = words.translate_out(words.dictionary[key][0:-2])
-		print(supStr)
 		words.out_word(supStr)
 		words.right_option(key)
 		words.del_right_option(key, dictOut.selectDict)
-		words.add_wrong_words(dictOut.selectDict)
+		words.add_wrong_words(words.wrongDict)
 		words.output_words()
 		wordsValid.prompt()
 		wordsValid.type_check(wordsValid.prompt)
 		wordsValid.check_entry(1, words.options, wordsValid.prompt, wordsValid.type_check)
-		words.compare_option(wordsValid.choice, key)
+		words.compare_option(wordsValid.choice, key, supStr)
+	words.del_right_answers()
 
 db.close()
