@@ -1,115 +1,101 @@
-"""
-def remember_words(studyDict):
-	print('\n\tRemember the words:')
-	for word in studyDict:
-		singleStr = ''
-		for translate in studyDict[word][0:-2]:
-			singleStr += translate
-			singleStr += ', '
-		singleStr = singleStr[0:-2]
-		print('\n', word, ' - ', singleStr)
-		input()
-"""
+import random
 
-class RememberWords:
-	"""docstring for RememberWords"""
-	def forming(self):
-		singleStr = ''
-		for translate in studyDict[word][0:-2]:
-			singleStr += translate + ', '
-		singleStr = singleStr[0:-2]
-		print('\n', word, ' - ', singleStr)
-		input()
-	def remember_words(self, forming):
-		print('\n\tRemember the words:')
-		global word
-		for word in studyDict:
-			forming()
-
-class ChoiceVar:
-	"""docstring for ChoiceVar"""
-	def __init__(self):
-		self.listForDel = []
-	def num_options(self, studyDict):				
-		if len(studyDict) >= 6:
+class ChoiceTranslations:
+	"""
+	Choose the correct translation
+	from the options
+	"""
+	def __init__(self, dict):
+		self.forDel = []
+		self.keysList = []
+		for key in dict:
+			self.keysList += [key]
+		random.shuffle(self.keysList)
+	def num_options(self, choice): # The number of proposed options			
+		if int(choice) >= 6:       # should be not more than six	
 			self.numOptions = 6
 		else:
-			self.numOptions = len(studyDict)
+			self.numOptions = int(choice)
+	def translate_out(self, theList):
+		supStr = ''
+		for translate in theList:				
+			supStr += translate + ', '
+		supStr = supStr[0:-2]
+		return supStr
 	def right_option(self, rightOption):
 		self.options = []
-		self.options += [rightOption[0:-2]]
-	def del_right_option(self):
-		self.singleDict = studyDict.copy()
-		del self.singleDict[word]
-	def add_wrong_options(self, wrongList):
-		self.singleList = []
-		for translat in wrongList:
-			self.singleList += [translat[0:-2]]
-		random.shuffle(self.singleList)
-		self.singleList = self.singleList[0:self.numOptions-1]
-		self.options += self.singleList
+		self.options += [rightOption]
+	def del_right_option(self, key, dict):
+		self.wrongDict = dict.copy()
+		del self.wrongDict[key]
+	def add_wrong_translations(self, wrongDict):
+		for word in wrongDict:
+			self.options += [wrongDict[word]]
+	def output_translations(self, translate_out):
+		self.options = self.options[0:self.numOptions]
+		supList = []
+		for key in self.options:
+			supList += [translate_out(key[0:-2])]
+		self.options = supList
 		random.shuffle(self.options)
-	def output_options(self):
-		self.supList = []
-		for item in self.options: 
-			self.singleStr = ''
-			for it in item:
-				self.singleStr += it + ', '
-			self.singleStr = self.singleStr[0:-2]
-			self.supList += [self.singleStr]
 		i = 0
-		for item in self.supList:
-			print('\n' + str(i + 1) + '.) ', item)
-			i += 1
-	def correct_wrong(self, choice, it, customizDict, forming):
-		if it in self.supList[int(choice) - 1]:
-			self.listForDel += [word]
+		for key in self.options:
+			print(str(i + 1) + '.) ', key)
+			i += 1 
+	def wrong_in_end(self):
+		self.keysList += [self.keysList[0]]
+		del self.keysList[0]
+	def compare_option(self, choice, value, 
+					   key, translate_out,
+					   wrong_in_end,
+					   custom_dict, customDict):
+		choice = [self.options[int(choice) - 1]]
+		if ', ' in choice[0]:
+			num = choice[0].find(', ')
+			choice = choice[0][0:num]
 		else:
-			print('Wrong')
-			forming()
-			customizDict[word][-1] += 1
-	def del_correct_answers(self, theDict):
-		for word in self.listForDel:
-			del theDict[word]
+			choice = choice[0]
+		if choice in value:
+			self.forDel += [key]
+		else:
+			supStr = translate_out(value[0:-2])
+			print("\tIt's wrong!\n", key, ' - ', supStr)
+			input()
+			wrong_in_end()
+			custom_dict(customDict, key)
+	def del_right_answers(self):
+		if self.forDel != []:
+			del self.keysList[0]
+		self.forDel = []				
 
+class ChoiceWords(ChoiceTranslations):
+	"""
+	Choose the correct word
+	from the options
+	"""
+	def __init__(self, dict):
+		ChoiceTranslations.__init__(self, dict)
+	def add_wrong_words(self, wrongDict):
+		for word in wrongDict:
+			self.options += [word]
+	def output_words(self):
+		self.options = self.options[0:self.numOptions]
+		random.shuffle(self.options)
+		i = 0
+		for key in self.options:
+			print(str(i + 1) + '.) ', key)
+			i += 1
+	def compare_option(self, choice, key, 
+		               supStr, wrong_in_end,
+		               custom_dict, customDict):
+		choice = [self.options[int(choice) - 1]]
+		if choice[0] == key:
+			self.forDel += [key]
+		else:
+			print("\tIt's wrong!\n", key, ' - ', supStr)
+			input()
+			wrong_in_end()
+			custom_dict(customDict, key)
 
-if __name__ == '__main__':
-
-	import shelve, random
-	from choice import InputValid
-
-	db = shelve.open('testdb')
-
-	studyDict = db['python']
-
-	theseWords = RememberWords()
-
-	theseWords.remember_words(theseWords.forming)
-
-	thisDict = ChoiceVar()
-	thisCheck = InputValid()
-
-	thisDict.num_options(studyDict)
-
-	supDict = studyDict.copy()
-	customizDict = db['python'].copy()
-
-	while supDict:
-		for word in supDict:
-			print('\n\t', word, '\n',
-				  '\n\tChoose the correct option:')
-			thisDict.right_option(studyDict[word])
-			thisDict.del_right_option()
-			thisDict.add_wrong_options(thisDict.singleDict.values())
-			thisDict.output_options()
-			thisCheck.prompt()
-			thisCheck.type_check(thisCheck.prompt)
-			thisCheck.check_entry(-100, thisDict.supList, thisCheck.prompt, thisCheck.type_check)
-			thisDict.correct_wrong(thisCheck.choice, studyDict[word][0], customizDict, theseWords.forming)
-		thisDict.del_correct_answers(supDict)
-		thisDict.listForDel = []
-	
-	db['python'] = customizDict
-	print(db['python'])
-
-	db.close()
+		
+		
