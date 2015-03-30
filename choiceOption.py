@@ -66,7 +66,8 @@ class ChoiceTranslations:
 	def del_right_answers(self):
 		if self.forDel != []:
 			del self.keysList[0]
-		self.forDel = []				
+		self.forDel = []
+
 
 class ChoiceWords(ChoiceTranslations):
 	"""

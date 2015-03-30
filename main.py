@@ -4,6 +4,7 @@ from formDict import Output, InputValid, FormDict
 from menu import Menu
 from rememberWords import RememberWords
 from choiceOption import ChoiceTranslations, ChoiceWords
+from writeOption import WriteTranslate, WriteWord
 
 db = shelve.open('testdb')
 
@@ -144,13 +145,48 @@ while trans.keysList or words.keysList:
 		break
 	words.del_right_answers()
 
-###############################################################
+#######################################################################
+
+# WRITE OF THE TRANCLATION OF THE WORD OR THE WORD OF THE TRANCLATION 
+
+writeTrans = WriteTranslate(dictOut.selectDict)
+writeWord = WriteWord(dictOut.selectDict)
+
+while writeTrans.keysList or writeWord.keysList:
+
+	for key in writeTrans.keysList:
+		print('\n', key)
+		print('\tWrite the translation:')
+		writeTrans.request()
+		writeTrans.compare(key, 
+						   dictOut.selectDict[key],
+						   trans.translate_out,
+						   writeTrans.wrong_in_end,
+						   custom_dict,
+						   customDict)
+		break
+	writeTrans.del_right_answers()
+
+	for key in writeWord.keysList:
+		supStr = words.translate_out(dictOut.selectDict[key][0:-2])
+		print('\n', supStr)
+		print('\tWrite the translation:')
+		writeWord.request()
+		writeWord.compare(key, 
+						  supStr,
+						  writeWord.wrong_in_end,
+						  custom_dict,
+						  customDict)
+		break
+	writeWord.del_right_answers()
+
+#######################################################################
 
 # to the number of studies adding 1
 for key in dictOut.selectDict: # to the studied words
 	customDict[key][-2] += 1   
 db[db['listDict'][int(listVal.choice) - 1][0]] = customDict
 
-###############################################################
+#######################################################################
 
 db.close()
