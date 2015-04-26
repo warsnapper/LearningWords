@@ -1,6 +1,6 @@
 
 import shelve, random
-from formDict import Output, InputValid, FormDict
+from formDict import *
 from menu import Menu
 from rememberWords import RememberWords
 from choiceOption import ChoiceTranslations, ChoiceWords
@@ -14,44 +14,53 @@ db = shelve.open('testdb')
 
 listOut = Output()
 insMenu = Menu()
-listVal = InputValid()
 
 def choice_dict(self_func):
 	
 	print('\n\tTo select, enter the number of the dictionary')
 	insMenu.zero_print()
 	listOut.list_output(db['listDict'])
+	listOut.request(listOut.request, -10, db['listDict'])
 
-	listVal.prompt() # Query for the number of dictionary
-	listVal.type_check(listVal.prompt) # Integer if the number entered?
-	listVal.check_entry(0, db['listDict'], listVal.prompt, listVal.type_check) # In need whether it is the range?
-
-	if int(listVal.choice) == 0: 
-		print('Sorry! This functionality is not yet available.\n')
-		input()
-		self_func(self_func)
+	if int(listOut.choice) == 0: 
+		insMenu.output_menu_list()
+		listOut.request(listOut.request, -1, [])
+		if int(listOut.choice) == -1:
+			self_func(self_func)
+		else:
+			insMenu.name_newDict(db['listDict'])
+			db['listDict'] = insMenu.theList
+			db[insMenu.nameNewDict] = {}
+			insMenu.add_newWord(db[insMenu.nameNewDict])
+			db[insMenu.nameNewDict] = insMenu.newDict
+			input()
+			self_func(self_func)
 
 choice_dict(choice_dict)
 
 dictOut = Output()
-dictVal = InputValid()
 
 def choice_words(self_func):
 
 	print('\n\tEnter how many words to the study')
 	insMenu.minus_one()
 	insMenu.zero_print()
-	dictOut.dict_output(listVal.choice, db)
+	dictOut.dict_output(listOut.choice, db)
+	dictOut.request(dictOut.request, 
+					-1, 
+					dictOut.selectDict)
 
-	dictVal.prompt()
-	dictVal.type_check(dictVal.prompt)
-	dictVal.check_entry(-1, dictOut.selectDict, dictVal.prompt, dictVal.type_check)
-
-	if int(dictVal.choice) == 0:
-		print('Sorry! This functionality is not yet available.\n')
-		input()
-		self_func(self_func)
-	elif int(dictVal.choice) == -1:
+	if int(dictOut.choice) == 0:
+		insMenu.output_menu_dict()
+		dictOut.request(dictOut.request, -1, [])
+		if int(dictOut.choice) == -1:
+			self_func(self_func)
+		elif int(dictOut.choice) == 0:
+			insMenu.add_newWord(dictOut.selectDict)
+			db[db['listDict'][int(listOut.choice) - 1][0]] = insMenu.newDict
+			input()
+			self_func(self_func)
+	elif int(dictOut.choice) == -1:
 		choice_dict(choice_dict)
 		self_func(self_func)
 
@@ -72,7 +81,7 @@ def custom_dict(customDict, key): # called each time when was incorrect answer
 
 dictForm = FormDict()
 
-dictForm.num_del(dictOut.selectDict, dictVal.choice)
+dictForm.num_del(dictOut.selectDict, dictOut.choice)
 while dictForm.numDel:
 	dictForm.max_study(dictOut.selectDict)
 	dictForm.min_wrongs(dictOut.selectDict)
@@ -92,11 +101,11 @@ theseWords.remember_words(dictOut.selectDict, theseWords.forming)
 # SELECT CORRECT OPTION
 
 trans = ChoiceTranslations(dictOut.selectDict) 
-transVal = InputValid()
+transVal = Output()
 words = ChoiceWords(dictOut.selectDict)
-wordsVal = InputValid()
+wordsVal = Output()
 
-trans.num_options(dictVal.choice)
+trans.num_options(dictOut.choice)
 
 while trans.keysList or words.keysList:
 
@@ -108,12 +117,9 @@ while trans.keysList or words.keysList:
 			                   dictOut.selectDict)
 		trans.add_wrong_translations(trans.wrongDict)
 		trans.output_translations(trans.translate_out)
-		transVal.prompt()
-		transVal.type_check(transVal.prompt)
-		transVal.check_entry(1,
-			                 trans.options,
-			                 transVal.prompt,
-			                 transVal.type_check)
+		transVal.request(transVal.request,
+						 1,
+						 dictOut.selectDict)
 		trans.compare_option(transVal.choice,
 							 dictOut.selectDict[key],
 							 key,
@@ -133,11 +139,9 @@ while trans.keysList or words.keysList:
 			                   dictOut.selectDict)
 		words.add_wrong_words(words.wrongDict)
 		words.output_words()
-		wordsVal.prompt()
-		wordsVal.type_check(wordsVal.prompt)
-		wordsVal.check_entry(1, words.options,
-						     wordsVal.prompt,
-						     wordsVal.type_check)
+		wordsVal.request(wordsVal.request,
+					     1,
+					     dictOut.selectDict)
 		words.compare_option(wordsVal.choice,
 							 key, supStr,
 							 words.wrong_in_end,
@@ -159,7 +163,7 @@ while writeTrans.keysList or writeWord.keysList:
 		print('\tWrite the translation:')
 		writeTrans.request()
 		writeTrans.compare(key, 
-						   dictOut.selectDict[key],
+						   customDict[key],
 						   trans.translate_out,
 						   writeTrans.wrong_in_end,
 						   custom_dict,
@@ -168,7 +172,7 @@ while writeTrans.keysList or writeWord.keysList:
 	writeTrans.del_right_answers()
 
 	for key in writeWord.keysList:
-		supStr = words.translate_out(dictOut.selectDict[key][0:-2])
+		supStr = words.translate_out(customDict[key][0:-2])
 		print('\n', supStr)
 		print('\tWrite the translation:')
 		writeWord.request()
@@ -185,7 +189,7 @@ while writeTrans.keysList or writeWord.keysList:
 # to the number of studies adding 1
 for key in dictOut.selectDict: # to the studied words
 	customDict[key][-2] += 1   
-db[db['listDict'][int(listVal.choice) - 1][0]] = customDict
+db[db['listDict'][int(listOut.choice) - 1][0]] = customDict
 
 #######################################################################
 

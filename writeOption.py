@@ -20,9 +20,13 @@ class WriteTranslate(ChoiceTranslations):
 		else:
 			supStr = translate_out(value[0:-2])
 			print("\tIt's wrong!\n", key, ' - ', supStr)
-			input()
-			wrong_in_end()
-			custom_dict(customDict, key)
+			request = input('If you enter the correct variant type 1: ')
+			if request == '1':
+				value.insert(-2, self.enter)
+				self.forDel += [key]
+			else:
+				wrong_in_end()
+				custom_dict(customDict, key)
 
 class WriteWord(WriteTranslate):
 	"""docstring for WriteWord"""

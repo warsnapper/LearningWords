@@ -13,35 +13,27 @@ class Output:
 	def dict_output(self, choice, db): # Displays the contents of a dictionary
 		self.choice = choice
 		self.selectDict = db[db['listDict'][int(self.choice) - 1][0]]
-		i = 0
+		self.listWords = []
 		for word in self.selectDict:
+			self.listWords += [word]
+		i = 0
+		for word in self.listWords:
 			print(str(i + 1) + '.) ', word, ' - ', self.selectDict[word])
 			i += 1
-
-class InputValid:
-	"""
-	Makes a request to a select element, 
-	validates the input
-	"""
-	def prompt(self): # Must be entered as an integer
+	def request(self, self_func, number, theList):
 		self.choice = input('\nEnter the number: ')
-	def type_check(self, request): # Put an integer?
-		while True:
-			try:
-				self.test = int(self.choice)
-				break
-			except: 
-				print('\nIncorrect input! Try again.')
-				request()
-	def check_entry(self, number, theList, request, type_check): # If the number you entered
-		while True:
+		try:
+			test = int(self.choice)
+		except:
+			print('\nIncorrect input! Try again.')
+			self_func(self_func, number, theList)
+		else:
 			if number <= int(self.choice) <= len(theList):
-				break
+				pass
 			else:
 				print('\nIncorrect input! Try again.')
-				request()
-				type_check(request) # you must ensure that choice is integer
-				                    # otherwise "if", above, may cause an exception
+				self_func(self_func, number, theList)
+
 class FormDict:
 	"""
 	Forming study dictionary.
@@ -65,39 +57,3 @@ class FormDict:
 				del dict[key]
 				break
 	
-if __name__ == '__main__':
-
-	import shelve
-
-	db = shelve.open('testdb')
-
-	listOut = Output()
-
-	listOut.list_output(db['listDict'])
-
-	listVal = InputValid()
-
-	listVal.prompt()
-	listVal.type_check(listVal.prompt)
-	listVal.check_entry(1, db['listDict'], listVal.prompt, listVal.type_check)
-
-	dictOut = Output()
-
-	dictOut.dict_output(listVal.choice, db)
-
-	dictVal = InputValid()
-
-	dictVal.prompt()
-	dictVal.type_check(dictVal.prompt)
-	dictVal.check_entry(1, dictOut.selectDict, dictVal.prompt, dictVal.type_check)
-
-	dictForm = FormDict()
-
-	dictForm.num_del(dictOut.selectDict, dictVal.choice)
-	while dictForm.numDel:
-		dictForm.max_study(dictOut.selectDict)
-		dictForm.min_wrongs(dictOut.selectDict)
-		dictForm.reduction(dictOut.selectDict)
-		dictForm.numDel -= 1
-
-	db.close()
